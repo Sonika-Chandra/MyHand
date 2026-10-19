@@ -1,0 +1,39 @@
+:root {
+  --bg: #111;
+  --text: #eee;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+}
+
+.stage video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.stage video,
+.stage canvas {
+  transform: scaleX(-1);
+}
