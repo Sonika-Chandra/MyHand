@@ -1,60 +1,67 @@
-// --- Grab the elements from the page ---
+import { startTracker, onFrame, HAND_CONNECTIONS } from './tracker.js';
+
 const video = document.getElementById('camera');
 const canvas = document.getElementById('overlay');
 const ctx = canvas.getContext('2d');
 const statusEl = document.getElementById('status');
 
-// --- Part A: start the camera ---
-async function startCamera() {
-  // No camera API usually means the page isn't on localhost/https
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    statusEl.textContent = 'Camera not available. Open this page from localhost or https.';
-    return;
+let loggedOnce = false;
+
+onFrame((frame) => {
+  if (!loggedOnce && frame.hands.length > 0) {
+    console.log('First frame with a hand:', frame);
+    loggedOnce = true;
   }
+  draw(frame);
+});
 
-  // Set up the listener BEFORE connecting the stream
-  video.addEventListener('loadedmetadata', () => {
-    canvas.width = video.videoWidth;    // drawing grid = real camera size
-    canvas.height = video.videoHeight;
-    statusEl.textContent = 'Camera on';
-    requestAnimationFrame(drawLoop);    // start the loop only once sizes are known
-  });
-
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { width: 640, height: 480, facingMode: 'user' },
-      audio: false,
-    });
-    video.srcObject = stream;
-  } catch (err) {
-    if (err.name === 'NotAllowedError') {
-      statusEl.textContent = 'Camera permission was denied. Allow it in the address bar and reload.';
-    } else if (err.name === 'NotFoundError') {
-      statusEl.textContent = 'No camera found.';
-    } else {
-      statusEl.textContent = 'Could not start the camera: ' + err.name;
-    }
-    console.error(err);
-  }
-}
-
-// --- Part B: the every-frame loop ---
-function drawLoop(time) {
-  // 1. wipe last frame
+function draw(frame) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // 2. work out where the dot goes (swings left and right over time)
-  const x = canvas.width / 2 + Math.sin(time / 500) * 150;
-  const y = canvas.height / 2;
+  for (const hand of frame.hands) {
+    const color = hand.side === 'Left' ? 'deepskyblue' : 'lime';
 
-  // 3. draw the dot
-  ctx.beginPath();
-  ctx.arc(x, y, 12, 0, Math.PI * 2);
-  ctx.fillStyle = 'lime';
-  ctx.fill();
+    // Skeleton lines
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    for (const { start, end } of HAND_CONNECTIONS) {
+      const [x1, y1] = hand.pts[start];
+      const [x2, y2] = hand.pts[end];
+      ctx.beginPath();
+      ctx.moveTo(x1 * canvas.width, y1 * canvas.height);
+      ctx.lineTo(x2 * canvas.width, y2 * canvas.height);
+      ctx.stroke();
+    }
 
-  // 4. ask for the next frame
-  requestAnimationFrame(drawLoop);
+    // Joint dots
+    ctx.fillStyle = color;
+    for (const [x, y] of hand.pts) {
+      ctx.beginPath();
+      ctx.arc(x * canvas.width, y * canvas.height, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
 }
 
-startCamera();
+async function main() {
+  statusEl.textContent = 'Loading camera and hand tracker…';
+  try {
+    await startTracker(video);
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    statusEl.textContent = 'Show your hand to the camera';
+  } catch (err) {
+    console.error(err);
+    if (err.name === 'NotAllowedError') {
+      statusEl.textContent = 'Camera permission was denied. Allow it and reload.';
+    } else if (err.name === 'NotFoundError') {
+      statusEl.textContent = 'No camera found.';
+    } else if (err.message === 'NoCameraAPI') {
+      statusEl.textContent = 'Camera not available. Open this page from localhost or https.';
+    } else {
+      statusEl.textContent = 'Could not start: ' + (err.message || err.name);
+    }
+  }
+}
+
+main();
