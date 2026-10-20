@@ -1,0 +1,10 @@
+{
+  "name": "myhand-neon",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Neon: speech and text to ASL with a signing neon figure",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/engine.test.js"
+  }
+}
