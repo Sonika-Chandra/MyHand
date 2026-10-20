@@ -62,3 +62,7 @@ See **GUIDE.md** for how a sentence flows through these files and how to change 
 - Speech recognition in Chrome is processed by Google's servers. Typed text only leaves your device if you add an AI key.
 
 This is a learning aid, not a replacement for a human interpreter.
+
+
+## Credits
+Built by Sonika Chandra with help from Claude (Anthropic) for code and explanations.
