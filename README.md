@@ -1,6 +1,11 @@
-# Neon (MyHand)
+# Neon (MyHand) (WORK IN PROGRESS)
 
 Neon turns English into American Sign Language. Type a sentence or speak it, and a neon figure signs it back to you.
+
+<img width="1275" height="617" alt="image" src="https://github.com/user-attachments/assets/43277551-ff73-4eea-9b8e-1c6a8d683ef6" />
+
+<img width="1257" height="583" alt="image" src="https://github.com/user-attachments/assets/66b6e140-ad1a-4a59-942f-0c451906cf3f" />
+
 
 - **Known words** (155 of them, like HELLO, MOTHER, LEARN, SCHOOL, HUNGRY) are signed as whole signs. Word forms are understood too: SIGNS, SIGNING and SIGNED all use SIGN.
 - **Anything else**, such as names, is fingerspelled letter by letter (A–Z and 0–9).
